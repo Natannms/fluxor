@@ -1,0 +1,120 @@
+// schema.prisma
+datasource db {
+  provider = "postgresql" 
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  password    String
+  role        UserRole     @default(COLABORADOR) // role global
+  memberships Membership[] // relação N:N via Membership
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?    // soft delete
+  companies Company[] // relação 1:N
+  sentInvites Invite[] @relation("InviterInvites")
+  projects    Project[]
+}
+
+model Company {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  type        CompanyType
+  invites   Invite[]
+  memberships Membership[] // relação N:N via Membership
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?    // soft delete
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  projects  Project[]
+}
+
+model Membership {
+  id        String        @id @default(cuid())
+  user      User          @relation(fields: [userId], references: [id])
+  userId    String
+  company   Company       @relation(fields: [companyId], references: [id])
+  companyId String
+  role      CompanyRole   @default(COLABORADOR) // cargo dentro da empresa
+  active    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  deletedAt DateTime?     // soft delete
+
+  @@unique([userId, companyId]) // garante que não duplique associação
+}
+
+
+model Invite {
+  id           String   @id @default(uuid())
+  inviterId    String
+  companyId    String
+  token        String   @unique
+  createdAt    DateTime @default(now())
+
+  company      Company  @relation(fields: [companyId], references: [id])
+  inviter      User     @relation("InviterInvites", fields: [inviterId], references: [id])
+}
+enum UserRole {
+  ADMIN_GLOBAL
+  GESTOR
+  COLABORADOR
+}
+
+enum CompanyRole {
+  ADMIN_EMPRESA
+  GESTOR
+  COLABORADOR
+}
+
+enum CompanyType {
+  SOFTWARE   // Vale AI
+  MARKETING  // Hub360
+}
+
+
+model Project {
+  id               String        @id @default(cuid())
+  companyId        String?
+  company          Company?      @relation(fields: [companyId], references: [id])
+  title            String
+  description      String?
+  clientName       String
+  clientEmail      String?
+  clientPhone      String?
+  stage            ProjectStage  @default(OPORTUNIDADE)
+  probability      Int?
+  budgetEstimate   Float?
+  timelineEstimate Int?
+  createdById      String
+  createdBy        User          @relation(fields: [createdById], references: [id])
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  deletedAt        DateTime?
+  meetings         String[]
+  artifacts        String[] 
+  approvals        String[]
+}
+
+enum ProjectStage {
+  OPORTUNIDADE
+  LEAD
+  BRIEFING1
+  BRIEFING2
+  DISCOVERY
+  PROPOSTA
+  CONTRATO
+  EXECUCAO
+  ENCERRADO
+}
+
+

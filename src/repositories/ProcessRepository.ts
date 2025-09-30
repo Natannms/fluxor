@@ -3,7 +3,7 @@ import { IProcessAdapter } from "../adapters/AdapterInterface";
 import { ProcessAdapter } from "../adapters/postgres/ProcessAdapter";
 
 export interface IProcessRepository {
-  createProcess(data: Process): Promise<Process>;
+  createProcess(data: Partial<Process>): Promise<Process>;
   getProcessById(id: string): Promise<Process>;
   getAllProcesses(): Promise<Process[]>;
   updateProcess(id: string, data: Process): Promise<Process>;

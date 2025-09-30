@@ -1,6 +1,7 @@
 import { Process } from "@/app/types/types";
 import { ProcessService } from "../src/services/ProcessService";
 import prisma from "../prisma/prismaClient";
+import { faker } from "@faker-js/faker";
 
 describe("ProcessService", () => {
     let testUser: any;
@@ -17,33 +18,23 @@ describe("ProcessService", () => {
       },
 
     });
-      // Cria uma empresa real para usar nos testes
-      testCompany = await prisma.company.create({
-        data: {
-          name: "Empresa Teste",
-          email: `company_test_${Date.now()}@email.com`,
-          password: "123456",
-          role: "COLABORADOR",
-        },
-      });
+  
   });
     afterAll(async () => {
       // Remove o usuário criado
-      await prisma.user.delete({ where: { id: testUser.id } });
+      //await prisma.user.delete({ where: { id: testUser.id } });
       // Remove a empresa criada
-      await prisma.company.delete({ where: { id: testCompany.id } });
+      //await prisma.company.delete({ where: { id: testCompany.id } });
     });
 
     it("shoud create a process", async () => {
         const service = new ProcessService();
-        const parans: Process = {
-            code:"PC01",
+        const parans: Partial<Process> = {
+            code: faker.lorem.word(),
             department: "TI",
             createdAt: new Date(),
             createdById: testUser.id,
-            id: "123456",
             name: "Processo Teste",
-            companyId: testCompany.id,
             inputs: [],
             outputs: [],
             stage: "DRAFT",
@@ -51,5 +42,6 @@ describe("ProcessService", () => {
             updatedAt: new Date(),
         }
         const process = await service.createProcess(parans)
+        expect(process).toHaveProperty("id")
     } )
 })

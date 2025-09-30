@@ -21,6 +21,9 @@ model User {
   companies Company[] // relação 1:N
   sentInvites Invite[] @relation("InviterInvites")
   projects    Project[]
+  createdProcesses Process[] @relation("CreatedProcesses")
+  ownedSteps ProcessStep[] @relation("OwnedSteps")
+  reviews ProcessReview[] @relation("UserReviews")
 }
 
 model Company {
@@ -120,10 +123,8 @@ enum ProjectStage {
 
 model Process {
   id            String        @id @default(cuid()) // Identificador único do processo
-  companyId     String        // Empresa à qual o processo pertence
-  company       Company       @relation(fields: [companyId], references: [id])
   createdById   String        // Usuário que criou o processo
-  createdBy     User          @relation(fields: [createdById], references: [id])
+  createdBy     User          @relation("CreatedProcesses", fields: [createdById], references: [id])
 
   name          String        // Nome do processo
   code          String        @unique // Código/ID único do processo
@@ -156,7 +157,7 @@ model ProcessStep {
   title         String   // Nome ou título da atividade
   description   String?  // Descrição detalhada da atividade
   ownerId       String?  // Usuário responsável pela execução
-  owner         User?    @relation(fields: [ownerId], references: [id])
+  owner         User?    @relation("OwnedSteps", fields: [ownerId], references: [id])
   estimatedTime Int?     // Estimativa de tempo em minutos
 }
 
@@ -189,7 +190,7 @@ model ProcessReview {
   processId   String       // Referência ao processo
   process     Process      @relation(fields: [processId], references: [id])
   reviewerId  String       // Usuário responsável pela revisão
-  reviewer    User         @relation(fields: [reviewerId], references: [id])
+  reviewer    User         @relation("UserReviews", fields: [reviewerId], references: [id])
   status      ReviewStatus // Status da revisão
   comments    String?      // Observações do revisor
   createdAt   DateTime     @default(now()) // Data da revisão

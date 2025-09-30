@@ -34,7 +34,6 @@ export type Invite = {
 
 export type Process = {
   id: string;
-  companyId: string;
   createdById: string;
   name: string;
   code: string;

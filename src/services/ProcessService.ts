@@ -2,7 +2,7 @@ import { Process } from "@/app/types/types";
 import { IProcessRepository, processRepository } from "../repositories/ProcessRepository";
 
 export interface IProcessService {
-  createProcess(data: Process): Promise<Process>;
+  createProcess(data: Partial<Process>): Promise<Process>;
   getProcessById(id: string): Promise<Process>;
   getAllProcesses(): Promise<Process[]>;
   updateProcess(id: string, data: Process): Promise<Process>;
@@ -12,9 +12,9 @@ export interface IProcessService {
 export class ProcessService implements IProcessService {
   constructor(private repository: IProcessRepository = processRepository) {}
 
-  async createProcess(data: Process) {
-    // return await this.repository.createProcess(data);
-    return data;
+  async createProcess(data: Partial<Process>) {
+    return await this.repository.createProcess(data);
+    
   }
   async getProcessById(id: string) {
     return await this.repository.getProcessById(id);

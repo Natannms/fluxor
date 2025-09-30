@@ -118,4 +118,93 @@ enum ProjectStage {
   ENCERRADO
 }
 
+model Process {
+  id            String        @id @default(cuid()) // Identificador único do processo
+  companyId     String        // Empresa à qual o processo pertence
+  company       Company       @relation(fields: [companyId], references: [id])
+  createdById   String        // Usuário que criou o processo
+  createdBy     User          @relation(fields: [createdById], references: [id])
+
+  name          String        // Nome do processo
+  code          String        @unique // Código/ID único do processo
+  description   String?       // Descrição geral do processo
+  department    String        // Área ou departamento responsável
+  objective     String?       // Objetivo do processo
+  scopeInclude  String?       // Escopo: o que está incluído
+  scopeExclude  String?       // Escopo: o que está excluído
+  trigger       String?       // Gatilho que inicia o processo
+  inputs        String[]      // Entradas necessárias para execução
+  outputs       String[]      // Saídas esperadas do processo
+  resources     String[]      // Recursos necessários para execução
+  stage         ProcessStage  @default(DRAFT) // Estado do processo no ciclo de vida
+
+  steps         ProcessStep[] // Passos/atividades do processo
+  kpis          ProcessKPI[]  // KPIs e métricas do processo
+  rules         ProcessRule[] // Regras, exceções e riscos do processo
+  reviews       ProcessReview[] // Histórico de revisões/aprovações
+
+  createdAt     DateTime      @default(now()) // Data de criação
+  updatedAt     DateTime      @updatedAt      // Última atualização
+  deletedAt     DateTime?     // Data de exclusão lógica (soft delete)
+}
+
+model ProcessStep {
+  id            String   @id @default(cuid()) // Identificador único do passo
+  processId     String   // Referência ao processo
+  process       Process  @relation(fields: [processId], references: [id])
+  order         Int      // Ordem sequencial do passo
+  title         String   // Nome ou título da atividade
+  description   String?  // Descrição detalhada da atividade
+  ownerId       String?  // Usuário responsável pela execução
+  owner         User?    @relation(fields: [ownerId], references: [id])
+  estimatedTime Int?     // Estimativa de tempo em minutos
+}
+
+model ProcessKPI {
+  id          String   @id @default(cuid()) // Identificador único do KPI
+  processId   String   // Referência ao processo
+  process     Process  @relation(fields: [processId], references: [id])
+  name        String   // Nome do indicador (ex: tempo médio, custo)
+  value       Float?   // Valor atual do indicador
+  unit        String?  // Unidade de medida (ex: horas, R$, %)
+}
+
+model ProcessRule {
+  id          String   @id @default(cuid()) // Identificador único da regra/risco
+  processId   String   // Referência ao processo
+  process     Process  @relation(fields: [processId], references: [id])
+  type        RuleType // Tipo: regra de negócio, exceção ou risco
+  description String   // Descrição da regra ou risco
+  mitigation  String?  // Plano de mitigação/controle (se aplicável)
+}
+
+enum RuleType {
+  BUSINESS_RULE  // Regras de negócio
+  EXCEPTION      // Exceções conhecidas
+  RISK           // Riscos potenciais
+}
+
+model ProcessReview {
+  id          String       @id @default(cuid()) // Identificador único da revisão
+  processId   String       // Referência ao processo
+  process     Process      @relation(fields: [processId], references: [id])
+  reviewerId  String       // Usuário responsável pela revisão
+  reviewer    User         @relation(fields: [reviewerId], references: [id])
+  status      ReviewStatus // Status da revisão
+  comments    String?      // Observações do revisor
+  createdAt   DateTime     @default(now()) // Data da revisão
+}
+
+enum ReviewStatus {
+  PENDING   // Revisão pendente
+  APPROVED  // Processo aprovado
+  REJECTED  // Processo rejeitado
+}
+
+enum ProcessStage {
+  DRAFT        // Rascunho inicial
+  UNDER_REVIEW // Em revisão
+  APPROVED     // Aprovado
+  PUBLISHED    // Publicado
+}
 

@@ -1,5 +1,5 @@
-import { Company } from "@/app/types/types";
-import { Membership } from "@/app/types/types";
+import { Company, Process, Membership } from "@/app/types/types";
+
 
 // Interface genérica para adaptadores de banco de dados
 export interface AdapterInterface {
@@ -26,10 +26,11 @@ export interface MembershipAdapterInterface {
     findCompanyByUserId(userId: string): Promise<Company | null>;
 }
 
-export interface IProjectAdapter {
-  create(data: any): Promise<any>;
-  findById(id: string): Promise<any>;
-  findAll(): Promise<any[]>;
-  update(id: string, data: any): Promise<any>;
+export interface IProcessAdapter {
+  create(data: Partial<Process>): Promise<Process>;
+  findById(id: string): Promise<Process>;
+  findAll(): Promise<Process[]>;
+  update(id: string, data: Partial<Process>): Promise<Process>;
   delete(id: string): Promise<void>;
 }
+

@@ -31,3 +31,26 @@ export type Invite = {
   token: string;
   createdAt: Date;
 };
+
+export type Process = {
+  id: string;
+  companyId: string;
+  createdById: string;
+  name: string;
+  code: string;
+  description?: string | null;
+  department: string;
+  objective?: string | null;
+  scopeInclude?: string | null;
+  scopeExclude?: string | null;
+  trigger?: string | null;
+  inputs: string[];
+  outputs: string[];
+  resources: string[];
+  stage: ProcessStage;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
+};
+
+export type ProcessStage = 'DRAFT' | 'UNDER_REVIEW' | 'APPROVED' | 'PUBLISHED';

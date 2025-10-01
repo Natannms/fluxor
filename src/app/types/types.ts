@@ -63,3 +63,32 @@ export type ProcessStep = {
   ownerId?: string | null;
   estimatedTime?: number | null;
 };
+
+export type ProcessKPI = {
+  id: string;
+  processId: string;
+  name: string;
+  value?: number | null;
+  unit?: string | null;
+};
+
+export type ProcessRule = {
+  id: string;
+  processId: string;
+  type: RuleType;
+  description: string;
+  mitigation?: string | null;
+};
+
+export type RuleType = 'BUSINESS_RULE' | 'EXCEPTION' | 'RISK';
+
+export type ProcessReview = {
+  id: string;
+  processId: string;
+  reviewerId: string;
+  status: ReviewStatus;
+  comments?: string | null;
+  createdAt: Date;
+};
+
+export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';

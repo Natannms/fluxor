@@ -1,4 +1,4 @@
-import { Company, Process, Membership } from "@/app/types/types";
+import { Company, Process, Membership, ProcessStep } from "@/app/types/types";
 
 
 // Interface genérica para adaptadores de banco de dados
@@ -31,6 +31,14 @@ export interface IProcessAdapter {
   findById(id: string): Promise<Process>;
   findAll(): Promise<Process[]>;
   update(id: string, data: Partial<Process>): Promise<Process>;
+  delete(id: string): Promise<void>;
+}
+
+export interface IProcessStepAdapter {
+  create(data: Partial<ProcessStep>): Promise<ProcessStep>;
+  findById(id: string): Promise<ProcessStep | null>;
+  findAll(): Promise<ProcessStep[]>;
+  update(id: string, data: Partial<ProcessStep>): Promise<ProcessStep>;
   delete(id: string): Promise<void>;
 }
 

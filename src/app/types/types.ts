@@ -53,3 +53,13 @@ export type Process = {
 };
 
 export type ProcessStage = 'DRAFT' | 'UNDER_REVIEW' | 'APPROVED' | 'PUBLISHED';
+
+export type ProcessStep = {
+  id: string;
+  processId: string;
+  order: number;
+  title: string;
+  description?: string | null;
+  ownerId?: string | null;
+  estimatedTime?: number | null;
+};

@@ -91,4 +91,8 @@ export type ProcessReview = {
   createdAt: Date;
 };
 
-export type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export enum ReviewStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}

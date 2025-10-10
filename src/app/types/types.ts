@@ -96,3 +96,28 @@ export enum ReviewStatus {
   APPROVED = "APPROVED",
   REJECTED = "REJECTED",
 }
+
+// --- TaskStep ---
+export type TaskStep = {
+  id: string;
+  stepId: string; // FK para ProcessStep
+  title: string;
+  description?: string | null;
+  assignedToId?: string | null;
+  dueDate?: Date | null;
+  status: TaskStepStatus;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type TaskStepStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+
+// --- Document ---
+export type Document = {
+  id: string;
+  stepId: string; // FK para ProcessStep
+  name: string;
+  url: string;
+  uploadedById: string;
+  uploadedAt: Date;
+};

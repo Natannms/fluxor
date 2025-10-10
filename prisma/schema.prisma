@@ -159,6 +159,8 @@ model ProcessStep {
   ownerId       String?  // Usuário responsável pela execução
   owner         User?    @relation("OwnedSteps", fields: [ownerId], references: [id])
   estimatedTime Int?     // Estimativa de tempo em minutos
+  taskSteps     TaskStep[] // Relação 1:N com TaskStep
+  documents Document[] // Relação 1:N com Document
 }
 
 model ProcessKPI {
@@ -183,6 +185,28 @@ enum RuleType {
   BUSINESS_RULE  // Regras de negócio
   EXCEPTION      // Exceções conhecidas
   RISK           // Riscos potenciais
+}
+
+model TaskStep {
+  id          String      @id @default(cuid()) // Identificador único da tarefa do passo
+  stepId      String      // FK para ProcessStep
+  step        ProcessStep @relation(fields: [stepId], references: [id])
+  title       String      // Título da tarefa
+  description String?     // Descrição da tarefa
+  status      String?     // Status da tarefa (ex: PENDENTE, CONCLUÍDO)
+  documents   Document[]  // Documentos relacionados à TaskStep
+}
+
+model Document {
+  id          String      @id @default(cuid()) // Identificador único do documento
+  stepId      String?     // FK para ProcessStep
+  step        ProcessStep? @relation(fields: [stepId], references: [id])
+  taskStepId  String?     // FK para TaskStep
+  taskStep    TaskStep?   @relation(fields: [taskStepId], references: [id])
+  title       String      // Título do documento
+  type        String      // Tipo do documento (ex: PDF, LINK, IMAGEM)
+  link        String?     // Link para o documento (se aplicável)
+  description String?     // Descrição do documento
 }
 
 model ProcessReview {

@@ -1,7 +1,7 @@
 import { Process } from "@/app/types/types";
 import { processService } from "@/services/ProcessService";
 
-export async function createProcess(data: Process) {
+export async function createProcess(data: Partial<Process>) {
   return await processService.createProcess(data);
 }
 

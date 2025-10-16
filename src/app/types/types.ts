@@ -113,11 +113,6 @@ export type TaskStep = {
 export type TaskStepStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
 
 // --- Document ---
-export type Document = {
-  id: string;
-  stepId: string; // FK para ProcessStep
-  name: string;
-  url: string;
-  uploadedById: string;
-  uploadedAt: Date;
-};
+// Remover o tipo manual Document
+// Não é necessário definir o tipo Document aqui, pois será usado o tipo do Prisma:
+// import { Document } from "@prisma/client";

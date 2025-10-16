@@ -1,18 +1,18 @@
-import { Document } from "@/app/types/types";
+import { Document as PrismaDocument, Prisma } from "@prisma/client";
 import { DocumentAdapter } from "../adapters/postgres/DocumentAdapter";
 
 export interface IDocumentRepository {
-  createDocument(data: Partial<Document>): Promise<Document>;
-  getDocumentById(id: string): Promise<Document | null>;
-  getAllDocuments(): Promise<Document[]>;
-  updateDocument(id: string, data: Document): Promise<Document>;
+  createDocument(data: Prisma.DocumentCreateInput): Promise<PrismaDocument>;
+  getDocumentById(id: string): Promise<PrismaDocument | null>;
+  getAllDocuments(): Promise<PrismaDocument[]>;
+  updateDocument(id: string, data: Prisma.DocumentUpdateInput): Promise<PrismaDocument>;
   deleteDocument(id: string): Promise<void>;
 }
 
 export class DocumentRepository implements IDocumentRepository {
   constructor(private adapter = DocumentAdapter) {}
 
-  async createDocument(data: Partial<Document>) {
+  async createDocument(data: Prisma.DocumentCreateInput) {
     return await this.adapter.create(data);
   }
   async getDocumentById(id: string) {
@@ -21,7 +21,7 @@ export class DocumentRepository implements IDocumentRepository {
   async getAllDocuments() {
     return await this.adapter.findAll();
   }
-  async updateDocument(id: string, data: Document) {
+  async updateDocument(id: string, data: Prisma.DocumentUpdateInput) {
     return await this.adapter.update(id, data);
   }
   async deleteDocument(id: string) {

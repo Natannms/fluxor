@@ -1,13 +1,14 @@
-import { Document } from "../src/app/types/types";
+import { Document as PrismaDocument, User, Process, ProcessStep } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { DocumentService } from "../src/services/DocumentService";
 import prisma from "../prisma/prismaClient";
 
 describe("DocumentService - regras e erros", () => {
   let service: DocumentService;
-  let testUser: any;
-  let testProcess: any;
-  let testStep: any;
-  let createdDocument: any;
+  let testUser: User;
+  let testProcess: Process;
+  let testStep: ProcessStep;
+  let createdDocument: PrismaDocument;
 
   beforeAll(async () => {
     service = new DocumentService();
@@ -57,23 +58,25 @@ describe("DocumentService - regras e erros", () => {
 
   // createDocument
   it("createDocument - happy path", async () => {
-    const params: Partial<Document> = {
-      stepId: testStep.id,
-      name: "Manual de Processo",
-      url: "https://example.com/manual.pdf",
-      uploadedById: testUser.id,
-      uploadedAt: new Date(),
-    };
+    const documentData: Prisma.DocumentCreateInput = {
+  title: "Manual de Processo",
+  type: "PDF",
+  link: "https://example.com/manual.pdf",
+  description: "Descrição do documento",
+  step: { connect: { id: testStep.id } },
+  // Se quiser relacionar ao TaskStep, use:
+  // taskStep: { connect: { id: testTaskStep.id } }
+};
 
-    createdDocument = await service.createDocument(params);
+    createdDocument = await service.createDocument(documentData);
     expect(createdDocument).toHaveProperty("id");
     expect(createdDocument.stepId).toBe(testStep.id);
-    expect(createdDocument.name).toBe("Manual de Processo");
-    expect(createdDocument.url).toBe("https://example.com/manual.pdf");
+    expect(createdDocument.title).toBe("Manual de Processo");
+    expect(createdDocument.link).toBe("https://example.com/manual.pdf");
   });
 
   it("createDocument - erro: dados inválidos", async () => {
-    await expect(service.createDocument({})).rejects.toThrow();
+    await expect(service.createDocument({} as Prisma.DocumentCreateInput)).rejects.toThrow();
   });
 
   // getDocumentById
@@ -97,18 +100,18 @@ describe("DocumentService - regras e erros", () => {
 
   // updateDocument
   it("updateDocument - happy path", async () => {
-    const updated = await service.updateDocument(createdDocument.id, {
-      ...createdDocument,
-      url: "https://example.com/manual_v2.pdf",
-      name: "Manual Atualizado",
-    });
-    expect(updated.url).toBe("https://example.com/manual_v2.pdf");
-    expect(updated.name).toBe("Manual Atualizado");
+    const updateData: Prisma.DocumentUpdateInput = {
+      link: { set: "https://example.com/manual_v2.pdf" },
+      title: { set: "Manual Atualizado" },
+    };
+    const updated = await service.updateDocument(createdDocument.id, updateData);
+    expect(updated.link).toBe("https://example.com/manual_v2.pdf");
+    expect(updated.title).toBe("Manual Atualizado");
   });
 
   it("updateDocument - erro: id inexistente", async () => {
     await expect(
-      service.updateDocument("id_inexistente", { name: "Novo" } as Document)
+      service.updateDocument("id_inexistente", { title: { set: "Novo" } })
     ).rejects.toThrow();
   });
 

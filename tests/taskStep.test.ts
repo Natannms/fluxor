@@ -58,13 +58,11 @@ describe("TaskStepService - regras e erros", () => {
   // createTaskStep
   it("createTaskStep - happy path", async () => {
     const params: Partial<TaskStep> = {
-      stepId: testStep.id,
-      title: "Tarefa do Passo",
-      description: "Descrição da tarefa",
-      assignedToId: testUser.id,
-      dueDate: new Date(),
-      status: "PENDING",
-    };
+  stepId: testStep.id,
+  title: "Tarefa do Passo",
+  description: "Descrição da tarefa",
+  status: "PENDING",
+};
 
     createdTaskStep = await service.createTaskStep(params);
     expect(createdTaskStep).toHaveProperty("id");

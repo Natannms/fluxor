@@ -31,3 +31,88 @@ export type Invite = {
   token: string;
   createdAt: Date;
 };
+
+export type Process = {
+  id: string;
+  createdById: string;
+  name: string;
+  code: string;
+  description?: string | null;
+  department: string;
+  objective?: string | null;
+  scopeInclude?: string | null;
+  scopeExclude?: string | null;
+  trigger?: string | null;
+  inputs: string[];
+  outputs: string[];
+  resources: string[];
+  stage: ProcessStage;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
+};
+
+export type ProcessStage = 'DRAFT' | 'UNDER_REVIEW' | 'APPROVED' | 'PUBLISHED';
+
+export type ProcessStep = {
+  id: string;
+  processId: string;
+  order: number;
+  title: string;
+  description?: string | null;
+  ownerId?: string | null;
+  estimatedTime?: number | null;
+};
+
+export type ProcessKPI = {
+  id: string;
+  processId: string;
+  name: string;
+  value?: number | null;
+  unit?: string | null;
+};
+
+export type ProcessRule = {
+  id: string;
+  processId: string;
+  type: RuleType;
+  description: string;
+  mitigation?: string | null;
+};
+
+export type RuleType = 'BUSINESS_RULE' | 'EXCEPTION' | 'RISK';
+
+export type ProcessReview = {
+  id: string;
+  processId: string;
+  reviewerId: string;
+  status: ReviewStatus;
+  comments?: string | null;
+  createdAt: Date;
+};
+
+export enum ReviewStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
+
+// --- TaskStep ---
+export type TaskStep = {
+  id: string;
+  stepId: string; // FK para ProcessStep
+  title: string;
+  description?: string | null;
+  assignedToId?: string | null;
+  dueDate?: Date | null;
+  status: TaskStepStatus;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type TaskStepStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+
+// --- Document ---
+// Remover o tipo manual Document
+// Não é necessário definir o tipo Document aqui, pois será usado o tipo do Prisma:
+// import { Document } from "@prisma/client";

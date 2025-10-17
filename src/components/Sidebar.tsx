@@ -6,7 +6,8 @@ import {
   HouseIcon,
   PackageIcon,
   KanbanIcon,
-  CaretLeftIcon
+  CaretLeftIcon,
+  CircuitryIcon,
 } from "@phosphor-icons/react";
 import { usePathname, useRouter } from "next/navigation";
 import { clearSession } from "@/utils/session";
@@ -46,7 +47,8 @@ export default function Sidebar() {
     ...(!hideOrganization
       ? [{ name: "Organization", href: "/organization", icon: PackageIcon }]
       : []),
-    { name: "Projects", href: "/projects", icon: KanbanIcon }
+    { name: "Projects", href: "/projects", icon: KanbanIcon },
+    { name: "Process", href: "/process", icon: CircuitryIcon }
   ];
 
   return (

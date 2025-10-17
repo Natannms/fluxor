@@ -1,6 +1,6 @@
 // schema.prisma
 datasource db {
-  provider = "postgresql" 
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,53 +17,63 @@ model User {
   memberships Membership[] // relação N:N via Membership
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  deletedAt   DateTime?    // soft delete
-  companies Company[] // relação 1:N
-  sentInvites Invite[] @relation("InviterInvites")
+  deletedAt   DateTime? // soft delete
+  companies   Company[] // relação 1:N
+  sentInvites Invite[]     @relation("InviterInvites")
   projects    Project[]
 }
 
 model Company {
-  id          String       @id @default(cuid())
-  name        String
-  description String?
-  type        CompanyType
-  invites   Invite[]
-  memberships Membership[] // relação N:N via Membership
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedAt   DateTime?    // soft delete
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id])
-  projects  Project[]
+  id                  String                       @id @default(cuid())
+  name                String
+  description         String?
+  type                CompanyType
+  invites             Invite[]
+  memberships         Membership[] // relação N:N via Membership
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  deletedAt           DateTime? // soft delete
+  ownerId             String
+  owner               User                         @relation(fields: [ownerId], references: [id])
+  projects            Project[]
+  departments         Department[] // novo: relação 1:N com Department
+  whatsappPermissions WhatsappInstancePermission[] // back-relation to permissions
 }
 
 model Membership {
-  id        String        @id @default(cuid())
-  user      User          @relation(fields: [userId], references: [id])
+  id        String  @id @default(cuid())
+  user      User    @relation(fields: [userId], references: [id])
   userId    String
-  company   Company       @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
   companyId String
-  role      CompanyRole   @default(COLABORADOR) // cargo dentro da empresa
-  active    Boolean       @default(true)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  deletedAt DateTime?     // soft delete
+
+  role CompanyRole @default(COLABORADOR)
+
+  active Boolean @default(true) // alinhado ao migration e aos tipos
+
+  // novo: associação opcional a departamento
+  department          Department?                  @relation(fields: [departmentId], references: [id])
+  departmentId        String?
+  whatsappPermissions WhatsappInstancePermission[] // back-relation to permissions
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
 
   @@unique([userId, companyId]) // garante que não duplique associação
 }
 
-
 model Invite {
-  id           String   @id @default(uuid())
-  inviterId    String
-  companyId    String
-  token        String   @unique
-  createdAt    DateTime @default(now())
+  id        String   @id @default(uuid())
+  inviterId String
+  companyId String
+  token     String   @unique
+  createdAt DateTime @default(now())
 
-  company      Company  @relation(fields: [companyId], references: [id])
-  inviter      User     @relation("InviterInvites", fields: [inviterId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+  inviter User    @relation("InviterInvites", fields: [inviterId], references: [id])
 }
+
 enum UserRole {
   ADMIN_GLOBAL
   GESTOR
@@ -77,34 +87,73 @@ enum CompanyRole {
 }
 
 enum CompanyType {
-  SOFTWARE   // Vale AI
-  MARKETING  // Hub360
+  SOFTWARE // Vale AI
+  MARKETING // Hub360
 }
 
+// novo: alvo da permissão de WhatsApp
+enum WhatsappPermissionTarget {
+  MEMBERSHIP
+  DEPARTMENT
+}
 
 model Project {
-  id               String        @id @default(cuid())
+  id               String       @id @default(cuid())
   companyId        String?
-  company          Company?      @relation(fields: [companyId], references: [id])
+  company          Company?     @relation(fields: [companyId], references: [id])
   title            String
   description      String?
   clientName       String
   clientEmail      String?
   clientPhone      String?
-  stage            ProjectStage  @default(OPORTUNIDADE)
+  stage            ProjectStage @default(OPORTUNIDADE)
   probability      Int?
   budgetEstimate   Float?
   timelineEstimate Int?
   createdById      String
-  createdBy        User          @relation(fields: [createdById], references: [id])
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdBy        User         @relation(fields: [createdById], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
   deletedAt        DateTime?
   meetings         String[]
-  artifacts        String[] 
+  artifacts        String[]
   approvals        String[]
 }
 
+// novo: modelo Department
+model Department {
+  id                  String                       @id @default(cuid())
+  name                String
+  companyId           String
+  company             Company                      @relation(fields: [companyId], references: [id])
+  memberships         Membership[]
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  deletedAt           DateTime?
+  whatsappPermissions WhatsappInstancePermission[] // back-relation to permissions
+}
+
+// novo: associação de instância de WhatsApp a membro ou departamento de uma empresa
+model WhatsappInstancePermission {
+  id        String  @id @default(cuid())
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  instanceId   String // id da instância (Evolution API)
+  instanceName String?
+
+  targetType   WhatsappPermissionTarget
+  membershipId String?
+  membership   Membership?              @relation(fields: [membershipId], references: [id])
+  departmentId String?
+  department   Department?              @relation(fields: [departmentId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([instanceId, companyId])
+}
 
 enum ProjectStage {
   OPORTUNIDADE
@@ -117,5 +166,3 @@ enum ProjectStage {
   EXECUCAO
   ENCERRADO
 }
-
-

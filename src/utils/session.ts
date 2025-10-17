@@ -11,6 +11,7 @@ type MinimalUser = {
   name: string;
   email: string;
   membershipToCompanyId?: string;
+  whatsappInstanceName?: string; // nome da instância do WhatsApp
 };
 
 function getSecret(): Uint8Array {
@@ -25,6 +26,7 @@ export async function createSession(user: MinimalUser) {
   const jwt = await new SignJWT(user)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
+    .setSubject(user.id) // garante que payload.sub contenha o id do usuário
     .setExpirationTime(`${MAX_AGE}s`)
     .sign(getSecret());
 
@@ -46,14 +48,14 @@ export async function getSessionUser(): Promise<MinimalUser | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret());
     const user = {
-      id: String(payload.sub),
+      id: String(payload.sub || payload.id || ""),
       name: String(payload.name || ""),
       email: String(payload.email || ""),
       membershipToCompanyId: String(payload.membershipToCompanyId || ""),
+      whatsappInstanceName: String(payload.whatsappInstanceName || ""),
     };
     return user;
   } catch {
-    // token inválido/expirado → remove cookie
     await destroySession();
     return null;
   }

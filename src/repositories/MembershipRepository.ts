@@ -7,6 +7,8 @@ export interface IMembershipRepository {
     updateMembership(membershipId: string, updateData: Partial<Membership>): Promise<number>;
     deleteMembership(query: object): Promise<number>;
     findCompanyByUserId(userId: string): Promise<any>;
+    getMembershipsByCompany(companyId: string): Promise<Membership[]>;
+    findMembershipByUserId(userId: string): Promise<Membership | null>;
 }
 
 export class MembershipRepository implements IMembershipRepository {
@@ -34,5 +36,13 @@ export class MembershipRepository implements IMembershipRepository {
 
     async findCompanyByUserId(userId: string) {
         return await this.adapter.findCompanyByUserId(userId);
+    }
+
+    async getMembershipsByCompany(companyId: string): Promise<Membership[]> {
+        return this.adapter.readByCompanyWithRelations(companyId);
+    }
+
+    async findMembershipByUserId(userId: string): Promise<Membership | null> {
+        return this.adapter.findByUserIdWithRelations(userId);
     }
 }

@@ -11,7 +11,6 @@ const repository = new CompanyRepository(adapter);
 const service = new CompanyService(repository);
 
 export async function createCompany(data: Partial<Company>) {
-    console.log("cheguo agora sabudega", data);
     return service.createCompany(data);
 }
 

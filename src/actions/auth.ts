@@ -7,6 +7,7 @@ import { AuthData, AuthRegisterData, AuthUser } from "../adapters/AuthInterface"
 import { AuthDataSchema, AuthRegisterDataSchema } from "@/utils/zodSchemas";
 import { createSession, destroySession } from "@/utils/session";
 import { findCompanyByUserId } from "@/actions/membership";
+import { getWhatsappInstances } from "@/actions/whatsapp";
 
 const adapter = new AuthPostgresAdapter();
 const repository = new AuthRepository(adapter);
@@ -70,16 +71,24 @@ export async function loginAction(data: any): Promise<ActionResponse> {
 
   if (isAuthUser(response)) {
     const company = await findCompanyByUserId(response.id);
+
+    // busca a primeira instância de WhatsApp disponível
+    let whatsappInstanceName = "";
+    try {
+      const instances = await getWhatsappInstances();
+      whatsappInstanceName = instances[0]?.name || "";
+    } catch {
+      // se a API de WhatsApp falhar, segue sem o nome
+      whatsappInstanceName = "";
+    }
+
     const userSession = {
       id: response.id,
       name: response.name!,
       email: response.email,
-      membershipToCompanyId: ''
-    }
-
-    if( company?.id){
-      userSession.membershipToCompanyId = company.id;
-    }
+      membershipToCompanyId: company?.id || "",
+      whatsappInstanceName,
+    };
 
     await createSession(userSession);
     return { data: response as any };

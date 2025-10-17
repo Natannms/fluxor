@@ -34,4 +34,11 @@ export class MembershipService implements MembershipServiceInterface<Membership>
     async deleteMembership(query: object): Promise<number> {
         return this.repository.deleteMembership(query);
     }
+
+    async getMembershipsByCompany(companyId: string): Promise<Membership[]> {
+        return this.repository.getMembershipsByCompany(companyId);
+    }
+    async findMembershipByUserId(userId: string) {
+        return await this.repository.findMembershipByUserId(userId);
+    }
 }

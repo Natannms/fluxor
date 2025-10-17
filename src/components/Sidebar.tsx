@@ -6,7 +6,9 @@ import {
   HouseIcon,
   PackageIcon,
   KanbanIcon,
-  CaretLeftIcon
+  CaretLeftIcon,
+  PlugsIcon,
+  WhatsappLogo
 } from "@phosphor-icons/react";
 import { usePathname, useRouter } from "next/navigation";
 import { clearSession } from "@/utils/session";
@@ -24,6 +26,7 @@ export default function Sidebar() {
     setIsMenuOpen(!isMenuOpen);
   };
   const [hideOrganization, setHideOrganization] = useState(false);
+  const [integrationsOpen, setIntegrationsOpen] = useState(false);
 
   useEffect(() => {
     async function checkMembership() {
@@ -97,6 +100,41 @@ export default function Sidebar() {
                   </button>
                 </li>
               ))}
+
+              {/* Integrations dropdown */}
+              <li key="Integrations">
+                <button
+                  onClick={() => setIntegrationsOpen(prev => !prev)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-200 text-left ${
+                    integrationsOpen ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  } justify-center px-6`}
+                >
+                  <PlugsIcon size={20} className="flex-shrink-0" weight="regular" />
+                  {isMenuOpen && (
+                    <span className="text-sm whitespace-nowrap">Integrations</span>
+                  )}
+                </button>
+
+                {integrationsOpen && (
+                  <ul className="mt-2 ml-6 space-y-1">
+                    <li>
+                      <button
+                        onClick={() => handleMenuClick("/whatsapp")}
+                        className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg font-medium transition-all duration-200 text-left ${
+                          pathname === "/whatsapp"
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                        }`}
+                      >
+                        <WhatsappLogo size={20} className="flex-shrink-0" weight="regular" />
+                        {isMenuOpen && (
+                          <span className="text-sm whitespace-nowrap">WhatsApp</span>
+                        )}
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </li>
             </ul>
           </nav>
         </div>

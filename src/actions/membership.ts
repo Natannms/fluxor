@@ -30,3 +30,15 @@ export async function deleteMembership(query: object) {
 export async function findCompanyByUserId(userId: string) {
   return await service.findCompanyByUserId(userId);
 }
+
+export async function getMembershipsByCompany(companyId: string) {
+  return await service.getMembershipsByCompany(companyId);
+}
+
+export async function updateMembershipDepartment(membershipId: string, departmentId: string | null) {
+  return await service.updateMembership(membershipId, { departmentId } as any);
+}
+
+export async function findMembershipByUserId(userId: string) {
+  return await service.findMembershipByUserId(userId);
+}

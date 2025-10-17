@@ -40,4 +40,18 @@ export class MembershipPostgresAdapter implements MembershipAdapterInterface {
         });
         return membership?.company || null;
     }
+
+    async readByCompanyWithRelations(companyId: string): Promise<Membership[]> {
+        return this.conn.membership.findMany({
+            where: { companyId },
+            include: { user: true, company: true, department: true },
+        });
+    }
+
+    async findByUserIdWithRelations(userId: string): Promise<Membership | null> {
+        return this.conn.membership.findFirst({
+            where: { userId },
+            include: { user: true, company: true, department: true },
+        });
+    }
 }
